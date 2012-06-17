@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="jp.kino.Training"
+    android:versionCode="1"
+    android:versionName="1.0" android:installLocation="auto">
+
+    <uses-sdk android:minSdkVersion="8" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".InputActivity" android:label="@string/input_name" >
+            <data android:mimeType="application/searchResult" />
+        </activity>
+        <activity android:name=".ShowActivity" android:label="@string/show_name"
+            android:configChanges="orientation" android:launchMode="singleTop" >
+            <intent-filter>
+            	<action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
+        </activity>
+        <provider android:name="BookTitleSuggestionsProvider"
+            android:authorities="jp.kino.Training" android:syncable="false" >
+        </provider>
+    </application>
+
+</manifest>
