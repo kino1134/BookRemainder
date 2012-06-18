@@ -354,7 +354,12 @@ public class MainActivity extends Activity {
     	dialog.setIndeterminate(false);
     	dialog.setTitle("処理中");
     	dialog.setMessage("データを取得しています。\r\nISBN:" + bundle.getString(DIALOG_KEY_ISBN));
-    	dialog.setCancelable(false);
+    	dialog.setCancelable(true);
+    	dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {  
+    	      public void onCancel(DialogInterface dialog) {
+    	        // TODO Thread を停止
+    	      }
+    	});
     	
     	return dialog;
     }

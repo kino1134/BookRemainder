@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream.PutField;
 import java.nio.channels.FileChannel;
 import java.util.Calendar;
 
@@ -156,11 +157,14 @@ public class InputActivity extends Activity {
 		public void onClick(View v) {
 	    	Bundle bundle = new Bundle();
 	    	showDialog(DIALOG_ID_PROGRESS, bundle);
-	    	    	
+	    	
 	    	final Handler handler = new Handler();
-	    	new Thread(new Runnable() {
+	    	final Intent intent = new Intent();
+	    	Thread t = new Thread(new Runnable() {
 				public void run() {
-					save();
+					SearchResult after = save();
+			    	intent.putExtra("SearchResultBefore", _searchRet);
+			    	intent.putExtra("SearchResultAfter", after);
 			    	
 					handler.post(new Runnable() {
 						public void run() {
@@ -168,9 +172,17 @@ public class InputActivity extends Activity {
 						}
 					});
 				}
-			}).start();
+			});
+	    	t.start();
+
+	    	try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 	    	
-        	setResult(Activity.RESULT_OK);
+	    	intent.putExtra("SearchResultBefore", _searchRet);
+        	setResult(Activity.RESULT_OK, intent);
 			finish();
 		}
 	};
@@ -178,7 +190,8 @@ public class InputActivity extends Activity {
 	/**
 	 * DBìoò^èàóù
 	 */
-	private void save() {
+	private SearchResult save() {
+		String id = _searchRet.getId();
 		// ìoò^ílÉ}ÉbÉsÉìÉO
 		ContentValues values = new ContentValues();
 		values.put(BookDatabaseHelper.BookColumnFormedTitle, ((EditText)findViewById(R.id.editTextFormed_title)).getText().toString());
@@ -204,7 +217,7 @@ public class InputActivity extends Activity {
 		
 		SQLiteDatabase db = dbhelper.getWritableDatabase();
 		if (_searchRet.getId().equals("")) {
-			db.insert(BookDatabaseHelper.BookTable, null, values);
+			id = Long.toString(db.insert(BookDatabaseHelper.BookTable, null, values));
 		} else {
 			db.update(BookDatabaseHelper.BookTable, values, "id = ?", new String[]{ _searchRet.getId() });
 		}
@@ -212,6 +225,25 @@ public class InputActivity extends Activity {
 		db.close();
 		
 		exportDb();
+		
+		return new SearchResult.Builder()
+							.id(id)
+							.asin(_searchRet.getAsin())
+							.detail_url(_searchRet.getDetail_url())
+							.image_url(_searchRet.getImage_url())
+							.author(((EditText)findViewById(R.id.editTextAuthor)).getText().toString())
+							.category(_searchRet.getCategory())
+							.media(_searchRet.getMedia())
+							.ean(_searchRet.getEan())
+							.publish_date(_searchRet.getPublish_date())
+							.publisher(_searchRet.getPublisher())
+							.price(_searchRet.getPrice())
+							.title(_searchRet.getTitle())
+							.formed_title(((EditText)findViewById(R.id.editTextFormed_title)).getText().toString())
+							.volume(((EditText)findViewById(R.id.editTextVolume)).getText().toString())
+							.buy_date(((EditText)findViewById(R.id.editTextBuy_date)).getText().toString())
+							.buy_price(((EditText)findViewById(R.id.editTextBuy_price)).getText().toString())
+							.build();
 	}
 	
 	/**

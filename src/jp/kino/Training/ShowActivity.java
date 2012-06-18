@@ -39,6 +39,8 @@ public class ShowActivity extends ListActivity {
     public static int REQUEST_CODE_INPUT = 1; 
 	/** Activity切替時のList位置を保存 */
     private int _position = 0;
+    /** 検索条件 */
+    private String _query;
     
     // region Activity イベント
     /**
@@ -123,6 +125,8 @@ public class ShowActivity extends ListActivity {
     		if (resultCode == Activity.RESULT_OK) {
     			Toast toast = Toast.makeText(this, "修正しました", Toast.LENGTH_SHORT);
     			toast.show();
+    			
+    			searchBook(_query);
     		}
     	}
     }
@@ -242,6 +246,8 @@ public class ShowActivity extends ListActivity {
         setListAdapter(adapter);
         
         ((TextView)findViewById(R.id.labelCount)).setText(getText(R.string.search_result) + Integer.toString(c.getCount()) + "件");
+        
+        _query = title;
         
         c.close();
         db.close();
